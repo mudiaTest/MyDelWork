@@ -1,0 +1,9 @@
+
+*.res
+*.identcache
+*.dsk
+*.dpr
+*.dproj
+*.local
+__history*/
+dcu*/
