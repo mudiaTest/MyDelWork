@@ -3,10 +3,13 @@ unit MyTypeObj;
 interface
 
 uses
-  MyAObject;
+  MyAObject, Classes;
 
 Type
 
+  TTypeGenObj = class;
+
+  //klasy funkcji setterów
   TSetByte = procedure(aval: Byte) of object;
   TSetShortInt = procedure(aval: ShortInt) of object;
   TSetWord = procedure(aval: Word) of object;
@@ -29,14 +32,26 @@ Type
   TSetWideString = procedure(aval: WideString) of object;
   TSetBoolean = procedure(aval: Boolean) of object;
 
-  TEventList = class
+  TATypeEvent = class(TAEventWraper)
+    owner: TTypeGenObj;
+    procedure DoTask; override;
   end;
-  
+
+  TTypeEventList = class(TEventList)
+  private
+    owner: TTypeGenObj;
+  public
+    constructor Create; reintroduce; overload;
+    constructor Create(aowner: TTypeGenObj); override; overload;
+    procedure AddEvent(aevent: TAEventWraper; lp: Integer); override;
+  end;
+
   TTypeGenObj = class (TAGenObj)
   private
+  // fnewVal : nowaWartoœæ;
     beforeSet: TEventList;
     afterSet: TEventList;
-  //znacznik, czy obiekt odpala eventy, nie
+  //znacznik: czy obiekt odpala eventy, nie
     fblFireEvents: Boolean;
   public
     constructor Create(aparent: TAObj = nil); override;
@@ -67,9 +82,11 @@ Type
     procedure SetValWithEvents(aval: Byte);
     function getByte: Byte;
     procedure setByte(aval: Byte);
-    procedure SetFireEvents(ablFireEvents: Boolean); override;
   published
+    procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: Byte read getByte write setByte;
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //ShortInt
@@ -81,9 +98,11 @@ Type
     procedure SetValWithEvents(aval: ShortInt);
     function getShortInt: ShortInt;
     procedure setShortInt(aval: ShortInt);
-    procedure SetFireEvents(ablFireEvents: Boolean); override;
   published
+    procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: ShortInt read getShortInt write setShortInt;
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //Word
@@ -95,9 +114,11 @@ Type
     procedure SetValWithEvents(aval: Word);
     function getWord: Word;
     procedure setWord(aval: Word);
+  published  
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
-    property val: Word read getWord write setWord;
+    property val: Word read getWord write setWord;        
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //SmallInt
@@ -109,9 +130,11 @@ Type
     procedure SetValWithEvents(aval: SmallInt);
     function getSmallInt: SmallInt;
     procedure setSmallInt(aval: SmallInt);
-    procedure SetFireEvents(ablFireEvents: Boolean); override;
   published
+    procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: SmallInt read getSmallInt write setSmallInt;
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //LongWord
@@ -123,9 +146,11 @@ Type
     procedure SetValWithEvents(aval: LongWord);
     function getLongWord: LongWord;
     procedure setLongWord(aval: LongWord);
+  published    
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
-    property val: LongWord read getLongWord write setLongWord;
+    property val: LongWord read getLongWord write setLongWord;  
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //Cardinal
@@ -137,9 +162,11 @@ Type
     procedure SetValWithEvents(aval: Cardinal);
     function getCardinal: Cardinal;
     procedure setCardinal(aval: Cardinal);
+  published    
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
-    property val: Cardinal read getCardinal write setCardinal;
+    property val: Cardinal read getCardinal write setCardinal;  
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //LongInt
@@ -151,24 +178,29 @@ Type
     procedure SetValWithEvents(aval: LongInt);
     function getLongInt: LongInt;
     procedure setLongInt(aval: LongInt);
+  published  
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
-    property val: LongInt read getLongInt write setLongInt;
+    property val: LongInt read getLongInt write setLongInt; 
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //Integer
   TAInteger = class(TTypeGenObj)
   private
+    fnewVal: Byte;
     fval: Integer;
     setterFunct: TSetInteger;
     procedure SetVal(aval: Integer);
     procedure SetValWithEvents(aval: Integer);
     function getInteger: Integer;
     procedure setInteger(aval: Integer);
+  published  
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
     //property pint: Integer read getInt write setInt;
-    property val: Integer read getInteger write setInteger;
+    property val: Integer read getInteger write setInteger;   
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //Int64
@@ -180,9 +212,11 @@ Type
     procedure SetValWithEvents(aval: Int64);
     function getInt64: Int64;
     procedure setInt64(aval: Int64);
+  published  
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
-    property val: Int64 read getInt64 write setInt64;
+    property val: Int64 read getInt64 write setInt64;  
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
    // : Decimal data types :
@@ -196,9 +230,11 @@ Type
     procedure SetValWithEvents(aval: Single);
     function getSingle: Single;
     procedure setSingle(aval: Single);
+  published     
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
-    property val: Single read getSingle write setSingle;
+    property val: Single read getSingle write setSingle; 
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //Currency;
@@ -210,9 +246,11 @@ Type
     procedure SetValWithEvents(aval: Currency);
     function getCurrency: Currency;
     procedure setCurrency(aval: Currency);
+  published    
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
-    property val: Currency read getCurrency write setCurrency;
+    property val: Currency read getCurrency write setCurrency;   
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //Double
@@ -224,9 +262,11 @@ Type
     procedure SetValWithEvents(aval: Double);
     function getDouble: Double;
     procedure setDouble(aval: Double);
+  published   
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
-    property val: Double read getDouble write setDouble;
+    property val: Double read getDouble write setDouble;  
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //Extended
@@ -238,9 +278,11 @@ Type
     procedure SetValWithEvents(aval: Extended);
     function getExtended: Extended;
     procedure setExtended(aval: Extended);
+  published   
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
-    property val: Extended read getExtended write setExtended;
+    property val: Extended read getExtended write setExtended;   
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   // : Strings :
@@ -254,9 +296,11 @@ Type
     procedure SetValWithEvents(aval: Char);
     function getChar: Char;
     procedure setChar(aval: Char);
+  published 
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
-    property val: Char read getChar write setChar;
+    property val: Char read getChar write setChar;   
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //WideChar
@@ -268,9 +312,11 @@ Type
     procedure SetValWithEvents(aval: WideChar);
     function getWideChar: WideChar;
     procedure setWideChar(aval: WideChar);
+  published  
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
-    property val: WideChar read getWideChar write setWideChar;
+    property val: WideChar read getWideChar write setWideChar; 
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //AnsiChar
@@ -282,9 +328,11 @@ Type
     procedure SetValWithEvents(aval: AnsiChar);
     function getAnsiChar: AnsiChar;
     procedure setAnsiChar(aval: AnsiChar);
+  published 
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
-    property val: AnsiChar read getAnsiChar write setAnsiChar;
+    property val: AnsiChar read getAnsiChar write setAnsiChar;   
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //ShortString
@@ -296,9 +344,11 @@ Type
     procedure SetValWithEvents(aval: ShortString);
     function getShortString: ShortString;
     procedure setShortString(aval: ShortString);
+  published   
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
-    property val: ShortString read getShortString write setShortString;
+    property val: ShortString read getShortString write setShortString;   
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //String
@@ -310,9 +360,11 @@ Type
     procedure SetValWithEvents(aval: String);
     function getString: String;
     procedure setString(aval: String);
+  published  
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
-    property val: String read getString write setString;
+    property val: String read getString write setString;  
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //AnsiString
@@ -324,9 +376,11 @@ Type
     procedure SetValWithEvents(aval: AnsiString);
     function getAnsiString: AnsiString;
     procedure setAnsiString(aval: AnsiString);
+  published  
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
-    property val: AnsiString read getAnsiString write setAnsiString;
+    property val: AnsiString read getAnsiString write setAnsiString;   
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
   //WideString
@@ -338,9 +392,11 @@ Type
     procedure SetValWithEvents(aval: WideString);
     function getWideString: WideString;
     procedure setWideString(aval: WideString);
+  published   
     procedure SetFireEvents(ablFireEvents: Boolean); override;
-  published
-    property val: WideString read getWideString write setWideString;
+    property val: WideString read getWideString write setWideString; 
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
  //Boolean
@@ -352,14 +408,25 @@ Type
     procedure SetValWithEvents(aval: Boolean);
     function getBoolean: Boolean;
     procedure setBoolean(aval: Boolean);
-    procedure SetFireEvents(ablFireEvents: Boolean); override;
   published
+    procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: Boolean read getBoolean write setBoolean;
+  public
+    constructor Create(aparent: TAObj = nil); override;
   end;
 
 implementation
 
+uses
+  MyUtils, SysUtils;
+
 { TAStr }
+
+constructor TAString.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
 
 function TAString.getString: String;
 begin
@@ -377,7 +444,7 @@ end;
 
 procedure TAString.setString(aval: String);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TAString.SetVal(aval: String);
@@ -394,6 +461,12 @@ end;
 
 { TAByte }
 
+constructor TAByte.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
+
 function TAByte.getByte: Byte;
 begin
   result := fval;
@@ -401,7 +474,7 @@ end;
 
 procedure TAByte.setByte(aval: Byte);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TAByte.SetFireEvents(ablFireEvents: Boolean);
@@ -427,6 +500,12 @@ end;
 
 { TAShortInt }
 
+constructor TAShortInt.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
+
 function TAShortInt.getShortInt: ShortInt;
 begin
   result := fval;
@@ -443,7 +522,7 @@ end;
 
 procedure TAShortInt.setShortInt(aval: ShortInt);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TAShortInt.SetVal(aval: ShortInt);
@@ -459,6 +538,12 @@ begin
 end;
 
 { TAInt64 }
+
+constructor TAInt64.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
 
 function TAInt64.getInt64: Int64;
 begin
@@ -476,7 +561,7 @@ end;
 
 procedure TAInt64.setInt64(aval: Int64);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TAInt64.SetVal(aval: Int64);
@@ -492,6 +577,12 @@ begin
 end;
 
 { TALongInt }
+
+constructor TALongInt.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
 
 function TALongInt.getLongInt: LongInt;
 begin
@@ -509,7 +600,7 @@ end;
 
 procedure TALongInt.setLongInt(aval: LongInt);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TALongInt.SetVal(aval: Integer);
@@ -525,6 +616,12 @@ begin
 end;
 
 { TAWord }
+
+constructor TAWord.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
 
 function TAWord.getWord: Word;
 begin
@@ -554,10 +651,16 @@ end;
 
 procedure TAWord.setWord(aval: Word);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 { TASmallInt }
+
+constructor TASmallInt.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
 
 function TASmallInt.getSmallInt: SmallInt;
 begin
@@ -575,7 +678,7 @@ end;
 
 procedure TASmallInt.setSmallInt(aval: SmallInt);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TASmallInt.SetVal(aval: SmallInt);
@@ -591,6 +694,12 @@ begin
 end;
 
 { TALongWord }
+
+constructor TALongWord.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
 
 function TALongWord.getLongWord: LongWord;
 begin
@@ -608,7 +717,7 @@ end;
 
 procedure TALongWord.setLongWord(aval: LongWord);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TALongWord.SetVal(aval: LongWord);
@@ -625,6 +734,12 @@ end;
 
 { TACardinal }
 
+constructor TACardinal.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
+
 function TACardinal.getCardinal: Cardinal;
 begin
   result := fval;
@@ -632,7 +747,7 @@ end;
 
 procedure TACardinal.setCardinal(aval: Cardinal);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TACardinal.SetFireEvents(ablFireEvents: Boolean);
@@ -658,6 +773,12 @@ end;
 
 { TAInteger }
 
+constructor TAInteger.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
+
 function TAInteger.getInteger: Integer;
 begin
   result := fval;
@@ -674,7 +795,7 @@ end;
 
 procedure TAInteger.setInteger(aval: Integer);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TAInteger.SetVal(aval: Integer);
@@ -684,12 +805,20 @@ end;
 
 procedure TAInteger.SetValWithEvents(aval: Integer);
 begin
+  fnewVal := aval;
   FireEventList(beforeSet);
   SetVal(aval);
   FireEventList(afterSet);
+  fnewVal := fVal;
 end;
 
 { TASingle }
+
+constructor TASingle.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
 
 function TASingle.getSingle: Single;
 begin
@@ -707,7 +836,7 @@ end;
 
 procedure TASingle.setSingle(aval: Single);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TASingle.SetVal(aval: Single);
@@ -724,6 +853,12 @@ end;
 
 { TACurrency }
 
+constructor TACurrency.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
+
 function TACurrency.getCurrency: Currency;
 begin
   result := fval;
@@ -731,7 +866,7 @@ end;
 
 procedure TACurrency.setCurrency(aval: Currency);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TACurrency.SetFireEvents(ablFireEvents: Boolean);
@@ -757,6 +892,12 @@ end;
 
 { TADouble }
 
+constructor TADouble.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
+
 function TADouble.getDouble: Double;
 begin
   result := fval;
@@ -764,7 +905,7 @@ end;
 
 procedure TADouble.setDouble(aval: Double);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TADouble.SetFireEvents(ablFireEvents: Boolean);
@@ -790,6 +931,12 @@ end;
 
 { TAExtended }
 
+constructor TAExtended.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
+
 function TAExtended.getExtended: Extended;
 begin
   result := fval;
@@ -797,7 +944,7 @@ end;
 
 procedure TAExtended.setExtended(aval: Extended);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TAExtended.SetFireEvents(ablFireEvents: Boolean);
@@ -823,6 +970,12 @@ end;
 
 { TAChar }
 
+constructor TAChar.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
+
 function TAChar.getChar: Char;
 begin
   result := fval;
@@ -830,7 +983,7 @@ end;
 
 procedure TAChar.setChar(aval: Char);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TAChar.SetFireEvents(ablFireEvents: Boolean);
@@ -855,6 +1008,12 @@ begin
 end;
 
 { TAWideChar }
+
+constructor TAWideChar.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
 
 function TAWideChar.getWideChar: WideChar;
 begin
@@ -884,10 +1043,16 @@ end;
 
 procedure TAWideChar.setWideChar(aval: WideChar);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 { TAAnsiChar }
+
+constructor TAAnsiChar.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
 
 function TAAnsiChar.getAnsiChar: AnsiChar;
 begin
@@ -896,7 +1061,7 @@ end;
 
 procedure TAAnsiChar.setAnsiChar(aval: AnsiChar);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TAAnsiChar.SetFireEvents(ablFireEvents: Boolean);
@@ -922,6 +1087,12 @@ end;
 
 { TAShortString }
 
+constructor TAShortString.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
+
 function TAShortString.getShortString: ShortString;
 begin
   result := fval;
@@ -938,12 +1109,12 @@ end;
 
 procedure TAShortString.setShortString(aval: ShortString);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TAShortString.SetVal(aval: ShortString);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TAShortString.SetValWithEvents(aval: ShortString);
@@ -955,6 +1126,12 @@ end;
 
 { TAAnsiString }
 
+constructor TAAnsiString.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
+
 function TAAnsiString.getAnsiString: AnsiString;
 begin
   result := fval;
@@ -962,7 +1139,7 @@ end;
 
 procedure TAAnsiString.setAnsiString(aval: AnsiString);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TAAnsiString.SetFireEvents(ablFireEvents: Boolean);
@@ -987,6 +1164,12 @@ begin
 end;
 
 { TAWideString }
+
+constructor TAWideString.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
 
 function TAWideString.getWideString: WideString;
 begin
@@ -1016,10 +1199,16 @@ end;
 
 procedure TAWideString.setWideString(aval: WideString);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 { TABoolean }
+
+constructor TABoolean.Create(aparent: TAObj);
+begin
+  inherited;
+  setterFunct := SetValWithEvents;
+end;
 
 function TABoolean.getBoolean: Boolean;
 begin
@@ -1028,7 +1217,7 @@ end;
 
 procedure TABoolean.setBoolean(aval: Boolean);
 begin
-  fval := aval;
+  setterFunct(aval);
 end;
 
 procedure TABoolean.SetFireEvents(ablFireEvents: Boolean);
@@ -1058,11 +1247,43 @@ constructor TTypeGenObj.Create(aparent: TAObj);
 begin
   inherited;
   fblFireEvents := false;
+  beforeSet := TEventList.Create;
+  afterSet := TEventList.Create;
 end;
 
 procedure TTypeGenObj.FireEventList(alist: TEventList);
+var
+  i: integer;
+  obj: TAEventWraper;
 begin
   //cia³o odpalacza eventów
+  for i:=0 to alist.count-1 do
+  begin
+    obj := alist.GetEvByIdx(i);
+    obj.DoTask;
+  end;
+  bp;
+end;
+
+{ TTypeEventList }
+
+constructor TTypeEventList.Create;
+begin
+  Assert(false, 'Niedozwolony konstruktor');
+end;
+
+procedure TTypeEventList.AddEvent(aevent: TAEventWraper; lp: Integer);
+begin
+  if not (aevent is TATypeEvent) then
+    Assert(false, 'Event klasy:' + aevent.className + ', oczekiwano:' + TATypeEvent.ClassName);
+  inherited;
+  (aevent as TATypeEvent).owner := owner;
+end;
+
+constructor TTypeEventList.Create(aowner: TTypeGenObj);
+begin
+  inherited Create;
+  owner := aowner;
 end;
 
 end.

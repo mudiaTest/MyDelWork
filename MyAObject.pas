@@ -13,7 +13,7 @@ type
   TEventProc = procedure(parentObj: TAGenObj) of object;
 
   {$M+}
-  TEventList = class
+ { TEventList = class
   private
     fData: TList;
     function GetItem(aIndex: integer): TEventProc;
@@ -25,7 +25,7 @@ type
     //procedure Remove(amethod: TEventProc);
     property Items[aIndex: integer]: TEventProc read GetItem; default;
     property Count: integer read GetCount;
-  end;
+  end;   }
 
   TAObj = class
   public
@@ -53,12 +53,34 @@ type
   //parent to ojciec, czyli obiekt na zmianê którego bêdzie wykonany event.
   //Zazwyczaj bêdzie to AObiekt dla typu prostego
   //parentHolder to "dziadek", czyli obekt, którego "polem" jest ww AObiekt
-  //dla typu prostego.
     parentHolder: TAObj;
   public
+  //procedura uruchamiana przez listê eventów
+    procedure DoTask; virtual; abstract;
     constructor Create(aparent: TAObj); override;
-  //dziedzicz¹ce funkcje bêd¹ mia³y w Exec kod wywo³uj¹cy odpowiedni¹ procedurê
-    procedure Exec; virtual; abstract;
+  end;
+
+  //Lista Eventów
+  // - eventy odpalaj¹ siê w kolejnoœci lp: od najmniejszego do najwiêkszego;
+  // - jest sotowana po lp dodawanego Eventu po ka¿dym dodaniu Eventu.
+  TEventList = class
+  private
+    evlist: TStringList;
+  public
+    constructor Create; reintroduce; virtual;
+    procedure Clear;
+    procedure AddEvent(aevent: TAEventWraper; lp: Integer); virtual;
+    procedure DelEvent(lp: Integer);
+  //oddaje evenetn to jego kluczy
+    function GetEvByVal(strLp: String): TAEventWraper;
+  //oddaje event po jego indeksie
+    function GetEvByIdx(lp: Integer): TAEventWraper;
+  //oddaje klucz po jego indeksie
+    function GetValByIdx(lp: Integer): String;
+  //zwraca liczbê eventów w liœcie
+    function Count: Integer;
+  //odpala ca³¹ listê eventów w kolejnoœci od najmniejszego lp.
+    procedure FireEventList;
   end;
 
   {$M-}
@@ -69,7 +91,7 @@ uses
   MyUtils, SysUtils;
 
 { TMethodList }
-
+ {
 procedure TEventList.Add(aproc: TEventProc);
 begin
   fData.Add( TMethod(aproc).Data );
@@ -116,6 +138,97 @@ begin
   end;
 end;}
 
+{ TEventList }
+{ TEventList }
+
+procedure TEventList.AddEvent(aevent: TAEventWraper; lp: integer);
+var
+  i: integer;
+  strLp: String;
+begin
+  strLp := IntToStr(lp);
+  if evList.IndexOf(strLp) > -1 then
+  begin
+    Assert(false, 'Istnieje ju¿ Event o numerze ' + IntToStr(lp));
+    Exit;
+  end;
+  evList.AddObject(strLp, aevent);
+  evList.CustomSort(StringListNrSort);
+end;
+
+procedure TEventList.Clear;
+begin
+  evList.Clear;
+end;
+
+function TEventList.Count: integer;
+begin
+  result := evList.Count;
+end;
+
+constructor TEventList.Create;
+begin
+  evlist := TStringList.Create;
+end;
+
+function TEventList.GetEvByIdx(lp: Integer): TAEventWraper;
+var
+  strLp: String;
+begin
+  if evList.Count-1 < lp then
+  begin
+    Assert(false, 'Brak Eventu o indeksie ' + IntToStr(lp));
+    Exit;
+  end;
+  result := evList.Objects[lp] as TAEventWraper;
+end;
+
+function TEventList.GetEvByVal(strLp: String): TAEventWraper;
+begin
+  if evList.IndexOf(strLp) = -1 then
+  begin
+    Assert(false, 'Brak Eventu o numerze ' + strLp);
+    Exit;
+  end;
+  result := evList.Objects[evList.indexOf(strLp)] as TAEventWraper;
+end;
+
+function TEventList.GetValByIdx(lp: Integer): String;
+begin
+  if evList.Count-1 < lp then
+   begin
+    Assert(false, 'Brak wartoœci: lp:' + IntToStr(lp) + '; count:' + IntToStr(evList.Count));
+    Exit;
+  end;
+  result := evList[lp];
+end;
+
+procedure TEventList.DelEvent(lp: integer);
+var
+  strLp: String;
+begin
+  strLp := IntToStr(lp);
+  if evList.IndexOf(strLp) = -1 then
+  begin
+    Assert(false, 'Brak Eventu o numerze ' + IntToStr(lp));
+    Exit;
+  end;
+  evList.Delete(lp);
+end;
+
+procedure TEventList.FireEventList;
+var
+  i: integer;
+  obj: TAEventWraper;
+begin
+  for i:=0 to count-1 do
+  begin
+    obj := GetEvByIdx(i);
+    obj.DoTask;
+  end;
+  bp;
+end;
+
 { TAGenObj }
 
 constructor TAGenObj.Create(aparent: TAObj = nil);
@@ -146,9 +259,7 @@ begin
       result := result and propObjSelf.EQ(propObjAObj);
     end
     else
-    begin
-      result := result and (GetPropValue(self, propInfo^.Name) = GetPropValue(aObj, propInfo^.Name))
-    end;
+      result := result and (GetPropValue(self, propInfo^.Name) = GetPropValue(aObj, propInfo^.Name));
     if not result then
       Exit;
   end;

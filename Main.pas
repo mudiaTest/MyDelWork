@@ -4,16 +4,18 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, MyAObject, MyTests, MyTypeObj;
+  Dialogs, MyAObject, MyTests, MyTypeObj, StdCtrls;
 
 type
-  TForm1 = class(TForm)
+  TMainForm = class(TForm)
     procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     procedure proc(i: integer);
     procedure akttest;
     procedure full;
     procedure DoAfterPOStrInsert(inObj: TAObj);
+    procedure EventSimpleTest;
     { Private declarations }
   public
     { Public declarations }
@@ -21,7 +23,7 @@ type
   end;
 
 var
-  Form1: TForm1;
+  MainForm: TMainForm;
 
 implementation                                                      
 
@@ -30,22 +32,21 @@ uses
 
 {$R *.dfm}
 
-procedure TForm1.proc(i: integer);
+procedure TMainForm.proc(i: integer);
 var
   j: integer;
 begin
- j := i;
- bp;
+  j := i;
+  i := j;
+  bp;
 end;
 
-procedure TForm1.tp(var kkk: String);
-var
-  jjj: integer;
+procedure TMainForm.tp(var kkk: String);
 begin
   kkk := 'u';
 end;
 
-procedure TForm1.DoAfterPOStrInsert(inObj: TAObj);
+procedure TMainForm.DoAfterPOStrInsert(inObj: TAObj);
 var
   o: TTest;
 begin
@@ -53,7 +54,8 @@ begin
   bp;
 end;
 
-procedure TForm1.akttest;
+//test kopiowania prostego obiektu o kilku polach
+procedure TMainForm.Akttest;
 var
   aobj: TTest;
   kaobj: TTest;
@@ -76,19 +78,11 @@ begin
   bp;
 end;
 
-procedure TForm1.FormCreate(Sender: TObject);
-begin
-  //full;
-  akttest;
-end;
-
-procedure TForm1.full;
+//test kopiowania obiektu o wszystkich mo¿liwych polach
+procedure TMainForm.Full;
 var
   aobj: TfullTest;
   kaobj: TfullTest;
-  i: integer;
-  b: boolean;
-  l: String;
 begin
   aobj:=TFullTest.create;
   aobj.pint:=6;
@@ -104,6 +98,30 @@ begin
   aobj.pvar:= 8.9;
   kaobj := aobj.kopia as tfulltest;
   bp;
+end;
+
+procedure TMainForm.EventSimpleTest;
+var
+  obj: TTestEvent;
+begin
+  obj := TTestEvent.Create;
+  obj.pint := TAInteger.Create(nil);
+  obj.pint.Val := 7;
+  obj.pint.SetFireEvents(true);
+  obj.pint.Val := 8;
+  bp;
+end;
+
+procedure TMainForm.FormCreate(Sender: TObject);
+begin
+  //full;
+  //akttest;
+  EventSimpleTest;
+end;
+
+procedure TMainForm.FormShow(Sender: TObject);
+begin
+  self.Close;
 end;
 
 end.

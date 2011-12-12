@@ -71,6 +71,25 @@ type
     //property pdynarray[Index : integer]: string read fdynarray write fdynarray;
   end;
 
+  TTestEvent = class(TAGenObj)
+  private
+    fint: TAInteger;
+  published
+    property pint: TAInteger read fInt write fInt;
+  end;
+
+  TATypeEventTest = class(TAEventWraper)
+    procedure DoTask; override;
+  end;
+
 implementation
+
+{ TATypeEventTest }
+
+procedure TATypeEventTest.DoTask;
+begin
+  inherited;
+  
+end;
 
 end.
