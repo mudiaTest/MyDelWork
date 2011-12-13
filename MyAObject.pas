@@ -11,6 +11,7 @@ type
 
   TTestProc = procedure(var i:string) of object;
   TEventProc = procedure(parentObj: TAGenObj) of object;
+  TAObjClass = class of TAObj;
 
   {$M+}
  { TEventList = class
@@ -30,7 +31,8 @@ type
   TAObj = class
   public
     parent: TAObj;
-    constructor Create(aparent: TAObj = nil); virtual;
+    constructor Create; overload; virtual;
+    constructor Create(aparent: TAObj); overload; virtual;
     function Kopia: TAObj; virtual; abstract;
     procedure PobierzZ(aobj: TAObj); virtual; abstract;
     function EQ(aobj: TAObj): boolean; virtual; abstract;
@@ -38,8 +40,6 @@ type
 
   TAGenObj = class (TAObj)
   public
-    //afterInsert: TEventList;
-    constructor Create(aparent: TAObj = nil); override;
     procedure initTest(i: integer);
     function Kopia: TAObj; override;
     procedure PobierzZ(aobj: TAObj); override;
@@ -66,7 +66,10 @@ type
   TEventList = class
   private
     evlist: TStringList;
+  protected
+    constructor CreatePrv; virtual;
   public
+    constructor CreatePrv2; virtual;
     constructor Create; reintroduce; virtual;
     procedure Clear;
     procedure AddEvent(aevent: TAEventWraper; lp: Integer); virtual;
@@ -168,7 +171,17 @@ end;
 
 constructor TEventList.Create;
 begin
+  Assert(false, 'Niedozwolony konstruktor');
+end;
+
+constructor TEventList.CreatePrv;
+begin
   evlist := TStringList.Create;
+end;
+
+constructor TEventList.CreatePrv2;
+begin
+
 end;
 
 function TEventList.GetEvByIdx(lp: Integer): TAEventWraper;
@@ -231,12 +244,6 @@ end;
 
 { TAGenObj }
 
-constructor TAGenObj.Create(aparent: TAObj = nil);
-begin
-  inherited;
-  //afterInsert := TEventList.Create;
-end;
-
 function TAGenObj.EQ(aobj: TAObj): boolean;
 var
   propCount: integer;
@@ -268,15 +275,16 @@ end;
 function TAGenObj.Kopia: TAObj;
 begin
   result := self.ClassType.Create as TAObj;
+  result.parent := self.parent;
   result.PobierzZ(self);
 end;
 
 procedure TAGenObj.PobierzZ(aobj: TAObj);
 var
-  i, propCount: integer;
+  i, propCount: Integer;
   list: TPropList;
   propInfo: PPropInfo;
-  propObj: TObject;
+  propObj: TAGenObj;
 begin
   if self.ClassName <> aobj.ClassName then
     Assert(false, 'PobierzZ: self: ' + self.ClassName +
@@ -290,11 +298,11 @@ begin
       begin
         if not (GetObjectProp(aobj, propInfo^.Name) is TAGenObj) then
           Assert(false, 'Obiekt z property jest klasy ' + GetObjectProp(aobj, propInfo^.Name).ClassName);
-        propObj := GetObjectProp(self, propInfo^.Name);
+        propObj := (GetObjectProp(self, propInfo^.Name) as TAGenObj);
         FreeNil(propObj);
-        propObj := GetObjectProp(aobj, propInfo^.Name).ClassType.Create;
+        propObj := TAObjClass(GetObjectProp(aobj, propInfo^.Name).ClassType).Create(self) as TAGenObj;
         SetObjectProp(self, propInfo^.Name, propObj);
-        (propObj as TAGenObj).PObierzZ(GetObjectProp(aobj, propInfo^.Name) as TAObj);
+        propObj.PObierzZ(GetObjectProp(aobj, propInfo^.Name) as TAObj);
       end;
       tkMethod :
       begin
@@ -332,9 +340,14 @@ end;
 
 { TAObj }
 
-constructor TAObj.Create(aparent: TAObj = nil);
+constructor TAObj.Create(aparent: TAObj);
 begin
   parent := aparent;
+end;
+
+constructor TAObj.Create;
+begin
+  Assert(false, 'Niedozwolony konstruktor');
 end;
 
 end.

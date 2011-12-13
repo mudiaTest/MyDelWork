@@ -103,12 +103,21 @@ end;
 procedure TMainForm.EventSimpleTest;
 var
   obj: TTestEvent;
+  obj2: TTestEvent;
 begin
-  obj := TTestEvent.Create;
-  obj.pint := TAInteger.Create(nil);
+  obj := TTestEvent.Create(nil);
+  obj.pint := TAInteger.Create(obj);
+  obj.pint.AddBeforeEv(TATypeEventBeforeTest.Create(obj.pint));
+  obj.pint.AddAfterEv(TATypeEventAfterTest.Create(obj.pint));
   obj.pint.Val := 7;
   obj.pint.SetFireEvents(true);
   obj.pint.Val := 8;
+
+  obj2 := (obj.Kopia as TTestEvent);
+  obj2.pint.SetFireEvents(false);
+  obj2.pint.Val := 7;
+  obj2.pint.SetFireEvents(true);
+  obj2.pint.Val := 8;
   bp;
 end;
 

@@ -33,32 +33,31 @@ Type
   TSetBoolean = procedure(aval: Boolean) of object;
 
   TATypeEvent = class(TAEventWraper)
+  public
     owner: TTypeGenObj;
-    procedure DoTask; override;
   end;
 
   TTypeEventList = class(TEventList)
   private
     owner: TTypeGenObj;
   public
-    constructor Create; reintroduce; overload;
-    constructor Create(aowner: TTypeGenObj); override; overload;
+    constructor Create(aowner: TTypeGenObj); overload;
     procedure AddEvent(aevent: TAEventWraper; lp: Integer); override;
   end;
 
   TTypeGenObj = class (TAGenObj)
   private
   // fnewVal : nowaWartoœæ;
-    beforeSet: TEventList;
-    afterSet: TEventList;
+    beforeSet: TTypeEventList;
+    afterSet: TTypeEventList;
   //znacznik: czy obiekt odpala eventy, nie
     fblFireEvents: Boolean;
-  public
-    constructor Create(aparent: TAObj = nil); override;
+    procedure FireSetEventsPart1;
+    procedure FireSetEventsPart2;
   published
   //pojemnik na funkcjê ustawiaj¹c¹ wartoœæ val
     //setterFunct: TSetXXX;
-    procedure FireEventList(alist: TEventList);
+    procedure FireEventList(alist: TTypeEventList);
     procedure SetFireEvents(blFireEvents: Boolean); virtual; abstract;
   //ustarwia wartoœæ val
     //procedure SetVal(aval:XXX );
@@ -68,6 +67,12 @@ Type
     //function getXXX: Double;
   //podstawowy setter - wywo³uje setterFunct
     //procedure setXXX(aval: XXX);
+    procedure AddBeforeEv(aev: TATypeEvent);
+    procedure AddAfterEv(aev: TATypeEvent);
+  public
+    constructor Create(aparent: TAObj); override;
+    //PobierzZ rozszerzoa o obs³ugê eventów.
+    procedure PobierzZ(aobj: TAObj); override;
     property blFireEvents: Boolean read fblFireEvents write SetFireEvents;
   end;
 
@@ -86,7 +91,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: Byte read getByte write setByte;
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //ShortInt
@@ -102,7 +107,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: ShortInt read getShortInt write setShortInt;
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //Word
@@ -118,7 +123,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: Word read getWord write setWord;        
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //SmallInt
@@ -134,7 +139,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: SmallInt read getSmallInt write setSmallInt;
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //LongWord
@@ -150,7 +155,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: LongWord read getLongWord write setLongWord;  
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //Cardinal
@@ -166,7 +171,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: Cardinal read getCardinal write setCardinal;  
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //LongInt
@@ -182,7 +187,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: LongInt read getLongInt write setLongInt; 
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //Integer
@@ -200,7 +205,7 @@ Type
     //property pint: Integer read getInt write setInt;
     property val: Integer read getInteger write setInteger;   
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //Int64
@@ -216,7 +221,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: Int64 read getInt64 write setInt64;  
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
    // : Decimal data types :
@@ -234,7 +239,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: Single read getSingle write setSingle; 
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //Currency;
@@ -250,7 +255,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: Currency read getCurrency write setCurrency;   
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //Double
@@ -266,7 +271,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: Double read getDouble write setDouble;  
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //Extended
@@ -282,7 +287,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: Extended read getExtended write setExtended;   
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   // : Strings :
@@ -300,7 +305,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: Char read getChar write setChar;   
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //WideChar
@@ -316,7 +321,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: WideChar read getWideChar write setWideChar; 
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //AnsiChar
@@ -332,7 +337,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: AnsiChar read getAnsiChar write setAnsiChar;   
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //ShortString
@@ -348,7 +353,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: ShortString read getShortString write setShortString;   
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //String
@@ -364,7 +369,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: String read getString write setString;  
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //AnsiString
@@ -380,7 +385,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: AnsiString read getAnsiString write setAnsiString;   
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
   //WideString
@@ -396,7 +401,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: WideString read getWideString write setWideString; 
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
  //Boolean
@@ -412,7 +417,7 @@ Type
     procedure SetFireEvents(ablFireEvents: Boolean); override;
     property val: Boolean read getBoolean write setBoolean;
   public
-    constructor Create(aparent: TAObj = nil); override;
+    constructor Create(aparent: TAObj); override;
   end;
 
 implementation
@@ -425,7 +430,7 @@ uses
 constructor TAString.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+  setterFunct := SetVal;
 end;
 
 function TAString.getString: String;
@@ -454,9 +459,14 @@ end;
 
 procedure TAString.SetValWithEvents(aval: String);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TAByte }
@@ -464,7 +474,7 @@ end;
 constructor TAByte.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TAByte.getByte: Byte;
@@ -493,9 +503,14 @@ end;
 
 procedure TAByte.SetValWithEvents(aval: Byte);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TAShortInt }
@@ -503,7 +518,7 @@ end;
 constructor TAShortInt.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TAShortInt.getShortInt: ShortInt;
@@ -532,9 +547,14 @@ end;
 
 procedure TAShortInt.SetValWithEvents(aval: ShortInt);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TAInt64 }
@@ -542,7 +562,7 @@ end;
 constructor TAInt64.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TAInt64.getInt64: Int64;
@@ -571,9 +591,14 @@ end;
 
 procedure TAInt64.SetValWithEvents(aval: Int64);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TALongInt }
@@ -581,7 +606,7 @@ end;
 constructor TALongInt.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TALongInt.getLongInt: LongInt;
@@ -610,9 +635,14 @@ end;
 
 procedure TALongInt.SetValWithEvents(aval: Integer);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TAWord }
@@ -620,7 +650,7 @@ end;
 constructor TAWord.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TAWord.getWord: Word;
@@ -644,9 +674,14 @@ end;
 
 procedure TAWord.SetValWithEvents(aval: Word);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 procedure TAWord.setWord(aval: Word);
@@ -659,7 +694,7 @@ end;
 constructor TASmallInt.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TASmallInt.getSmallInt: SmallInt;
@@ -688,9 +723,14 @@ end;
 
 procedure TASmallInt.SetValWithEvents(aval: SmallInt);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TALongWord }
@@ -698,7 +738,7 @@ end;
 constructor TALongWord.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TALongWord.getLongWord: LongWord;
@@ -727,9 +767,14 @@ end;
 
 procedure TALongWord.SetValWithEvents(aval: LongWord);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TACardinal }
@@ -737,7 +782,7 @@ end;
 constructor TACardinal.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TACardinal.getCardinal: Cardinal;
@@ -766,9 +811,14 @@ end;
 
 procedure TACardinal.SetValWithEvents(aval: Cardinal);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TAInteger }
@@ -776,7 +826,7 @@ end;
 constructor TAInteger.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+  setterFunct := SetVal;
 end;
 
 function TAInteger.getInteger: Integer;
@@ -805,11 +855,14 @@ end;
 
 procedure TAInteger.SetValWithEvents(aval: Integer);
 begin
-  fnewVal := aval;
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
-  fnewVal := fVal;
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TASingle }
@@ -817,7 +870,7 @@ end;
 constructor TASingle.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TASingle.getSingle: Single;
@@ -846,9 +899,14 @@ end;
 
 procedure TASingle.SetValWithEvents(aval: Single);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TACurrency }
@@ -856,7 +914,7 @@ end;
 constructor TACurrency.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TACurrency.getCurrency: Currency;
@@ -885,9 +943,14 @@ end;
 
 procedure TACurrency.SetValWithEvents(aval: Currency);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TADouble }
@@ -895,7 +958,7 @@ end;
 constructor TADouble.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TADouble.getDouble: Double;
@@ -924,9 +987,14 @@ end;
 
 procedure TADouble.SetValWithEvents(aval: Double);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TAExtended }
@@ -934,7 +1002,7 @@ end;
 constructor TAExtended.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TAExtended.getExtended: Extended;
@@ -963,9 +1031,14 @@ end;
 
 procedure TAExtended.SetValWithEvents(aval: Extended);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TAChar }
@@ -973,7 +1046,7 @@ end;
 constructor TAChar.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TAChar.getChar: Char;
@@ -1002,9 +1075,14 @@ end;
 
 procedure TAChar.SetValWithEvents(aval: Char);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TAWideChar }
@@ -1012,7 +1090,7 @@ end;
 constructor TAWideChar.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TAWideChar.getWideChar: WideChar;
@@ -1036,9 +1114,14 @@ end;
 
 procedure TAWideChar.SetValWithEvents(aval: WideChar);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 procedure TAWideChar.setWideChar(aval: WideChar);
@@ -1051,7 +1134,7 @@ end;
 constructor TAAnsiChar.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TAAnsiChar.getAnsiChar: AnsiChar;
@@ -1080,9 +1163,14 @@ end;
 
 procedure TAAnsiChar.SetValWithEvents(aval: AnsiChar);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TAShortString }
@@ -1090,7 +1178,7 @@ end;
 constructor TAShortString.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TAShortString.getShortString: ShortString;
@@ -1119,9 +1207,14 @@ end;
 
 procedure TAShortString.SetValWithEvents(aval: ShortString);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TAAnsiString }
@@ -1129,7 +1222,7 @@ end;
 constructor TAAnsiString.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TAAnsiString.getAnsiString: AnsiString;
@@ -1158,9 +1251,14 @@ end;
 
 procedure TAAnsiString.SetValWithEvents(aval: AnsiString);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TAWideString }
@@ -1168,7 +1266,7 @@ end;
 constructor TAWideString.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TAWideString.getWideString: WideString;
@@ -1192,9 +1290,14 @@ end;
 
 procedure TAWideString.SetValWithEvents(aval: WideString);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 procedure TAWideString.setWideString(aval: WideString);
@@ -1207,7 +1310,7 @@ end;
 constructor TABoolean.Create(aparent: TAObj);
 begin
   inherited;
-  setterFunct := SetValWithEvents;
+   setterFunct := SetVal;
 end;
 
 function TABoolean.getBoolean: Boolean;
@@ -1236,41 +1339,89 @@ end;
 
 procedure TABoolean.SetValWithEvents(aval: Boolean);
 begin
-  FireEventList(beforeSet);
-  SetVal(aval);
-  FireEventList(afterSet);
+  try
+    setterFunct := SetVal;
+    FireSetEventsPart1;
+    SetVal(aval);
+    FireSetEventsPart2;
+  finally
+    setterFunct := SetValWithEvents;
+  end;
 end;
 
 { TTypeGenObj }
+
+procedure TTypeGenObj.AddBeforeEv(aev: TATypeEvent);
+begin
+  beforeSet.AddEvent(aev, 0);
+end;
+
+procedure TTypeGenObj.AddAfterEv(aev: TATypeEvent);
+begin
+  afterSet.AddEvent(aev, 0);
+end;
 
 constructor TTypeGenObj.Create(aparent: TAObj);
 begin
   inherited;
   fblFireEvents := false;
-  beforeSet := TEventList.Create;
-  afterSet := TEventList.Create;
+  beforeSet := TTypeEventList.Create(self);
+  afterSet := TTypeEventList.Create(self);
 end;
 
-procedure TTypeGenObj.FireEventList(alist: TEventList);
+procedure TTypeGenObj.FireEventList(alist: TTypeEventList);
 var
   i: integer;
   obj: TAEventWraper;
 begin
-  //cia³o odpalacza eventów
-  for i:=0 to alist.count-1 do
-  begin
-    obj := alist.GetEvByIdx(i);
-    obj.DoTask;
+  if fblFireEvents then
+    //cia³o odpalacza eventów
+    for i:=0 to alist.count-1 do
+    begin
+      obj := alist.GetEvByIdx(i);
+      obj.DoTask;
+    end;
+end;
+
+procedure TTypeGenObj.FireSetEventsPart1;
+begin
+  if fblFireEvents then
+  try
+    FireEventList(beforeSet);
+  finally
+    fblFireEvents := true;
   end;
-  bp;
+end;
+
+procedure TTypeGenObj.FireSetEventsPart2;
+begin
+  if fblFireEvents then
+  try
+    FireEventList(afterSet);
+  finally
+    fblFireEvents := true;
+  end;
+end;
+
+procedure TTypeGenObj.PobierzZ(aobj: TAObj);
+var
+  tmpfblFireEvents: boolean;
+begin
+  try
+    fblFireEvents := false;
+    inherited;
+    fblFireEvents := (aobj as TTypeGenObj).blFireEvents;
+//W przypadku zaistnienia b³êdów przywracamy wartoœæ blFireEvents
+  except
+    on e:Exception do
+    begin
+      fblFireEvents := tmpfblFireEvents;
+      raise;
+    end;
+  end;
 end;
 
 { TTypeEventList }
-
-constructor TTypeEventList.Create;
-begin
-  Assert(false, 'Niedozwolony konstruktor');
-end;
 
 procedure TTypeEventList.AddEvent(aevent: TAEventWraper; lp: Integer);
 begin
@@ -1282,7 +1433,7 @@ end;
 
 constructor TTypeEventList.Create(aowner: TTypeGenObj);
 begin
-  inherited Create;
+  CreatePrv;
   owner := aowner;
 end;
 

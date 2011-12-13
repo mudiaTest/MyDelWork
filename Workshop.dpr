@@ -2,10 +2,10 @@ program Workshop;
 
 uses
   Forms,
-  Main in 'Main.pas' {Form1},
+  MyUtils in 'MyUtils.pas',
+  Main in 'Main.pas' {MainForm},
   MyAObject in 'MyAObject.pas',
   MyTests in 'MyTests.pas',
-  MyUtils in 'MyUtils.pas',
   MyTypeObj in 'MyTypeObj.pas';
 
 {$R *.res}
@@ -13,6 +13,6 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TMainForm, MainForm);
   Application.Run;
 end.

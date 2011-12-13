@@ -78,7 +78,11 @@ type
     property pint: TAInteger read fInt write fInt;
   end;
 
-  TATypeEventTest = class(TAEventWraper)
+  TATypeEventBeforeTest = class(TATypeEvent)
+    procedure DoTask; override;
+  end;
+
+  TATypeEventAfterTest = class(TATypeEvent)
     procedure DoTask; override;
   end;
 
@@ -86,10 +90,16 @@ implementation
 
 { TATypeEventTest }
 
-procedure TATypeEventTest.DoTask;
+procedure TATypeEventBeforeTest.DoTask;
 begin
   inherited;
-  
+  (owner as TAInteger).Val := 65;
+end;
+
+procedure TATypeEventAfterTest.DoTask;
+begin
+  inherited;
+  (owner as TAInteger).Val := 66;
 end;
 
 end.
