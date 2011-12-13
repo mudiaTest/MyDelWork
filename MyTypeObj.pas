@@ -41,7 +41,7 @@ Type
   private
     owner: TTypeGenObj;
   public
-    constructor Create(aowner: TTypeGenObj); overload;
+    constructor Create(aowner: TTypeGenObj); reintroduce; overload;
     procedure AddEvent(aevent: TAEventWraper; lp: Integer); override;
   end;
 
@@ -58,7 +58,7 @@ Type
   //pojemnik na funkcjê ustawiaj¹c¹ wartoœæ val
     //setterFunct: TSetXXX;
     procedure FireEventList(alist: TTypeEventList);
-    procedure SetFireEvents(blFireEvents: Boolean); virtual; abstract;
+    procedure SetFireEvents(blFireEvents: Boolean); virtual; abstract; 
   //ustarwia wartoœæ val
     //procedure SetVal(aval:XXX );
   //wywo³uje SetVal, ale uruchamia eventy przed i po
@@ -193,7 +193,6 @@ Type
   //Integer
   TAInteger = class(TTypeGenObj)
   private
-    fnewVal: Byte;
     fval: Integer;
     setterFunct: TSetInteger;
     procedure SetVal(aval: Integer);
@@ -1407,6 +1406,7 @@ procedure TTypeGenObj.PobierzZ(aobj: TAObj);
 var
   tmpfblFireEvents: boolean;
 begin
+  tmpfblFireEvents := fblFireEvents;
   try
     fblFireEvents := false;
     inherited;

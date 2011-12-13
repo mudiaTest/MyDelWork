@@ -69,7 +69,6 @@ type
   protected
     constructor CreatePrv; virtual;
   public
-    constructor CreatePrv2; virtual;
     constructor Create; reintroduce; virtual;
     procedure Clear;
     procedure AddEvent(aevent: TAEventWraper; lp: Integer); virtual;
@@ -146,7 +145,6 @@ end;}
 
 procedure TEventList.AddEvent(aevent: TAEventWraper; lp: integer);
 var
-  i: integer;
   strLp: String;
 begin
   strLp := IntToStr(lp);
@@ -179,15 +177,9 @@ begin
   evlist := TStringList.Create;
 end;
 
-constructor TEventList.CreatePrv2;
-begin
-
-end;
-
 function TEventList.GetEvByIdx(lp: Integer): TAEventWraper;
-var
-  strLp: String;
 begin
+  result := nil;
   if evList.Count-1 < lp then
   begin
     Assert(false, 'Brak Eventu o indeksie ' + IntToStr(lp));
@@ -198,6 +190,7 @@ end;
 
 function TEventList.GetEvByVal(strLp: String): TAEventWraper;
 begin
+  result := nil;
   if evList.IndexOf(strLp) = -1 then
   begin
     Assert(false, 'Brak Eventu o numerze ' + strLp);
