@@ -56,7 +56,7 @@ type
     parentHolder: TAObj;
   public
   //procedura uruchamiana przez listê eventów
-    procedure DoTask; virtual; abstract;
+    function DoTask: boolean; virtual;
     constructor Create(aparent: TAObj); override;
   end;
 
@@ -329,6 +329,11 @@ constructor TAEventWraper.Create(aparent: TAObj);
 begin
   inherited;
   parentHolder := aparent.parent;
+end;
+
+function TAEventWraper.DoTask: boolean;
+begin
+  result := true;
 end;
 
 { TAObj }

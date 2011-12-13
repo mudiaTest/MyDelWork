@@ -79,27 +79,49 @@ type
   end;
 
   TATypeEventBeforeTest = class(TATypeEvent)
-    procedure DoTask; override;
+  private
+    locV: Pinteger;
+  public
+    function DoTask: boolean; override;
+    constructor Create(aparent: TAObj; var v: Integer); overload;
   end;
 
   TATypeEventAfterTest = class(TATypeEvent)
-    procedure DoTask; override;
+  private
+    locV: Pinteger;
+  public
+    function DoTask: boolean; override;
+    constructor Create(aparent: TAObj; var v: Integer); overload;
   end;
 
 implementation
 
 { TATypeEventTest }
 
-procedure TATypeEventBeforeTest.DoTask;
+constructor TATypeEventBeforeTest.Create(aparent: TAObj; var v: Integer);
 begin
-  inherited;
-  (owner as TAInteger).Val := 65;
+  Create(aparent);
+  locV := @v;
 end;
 
-procedure TATypeEventAfterTest.DoTask;
+function TATypeEventBeforeTest.DoTask: boolean;
 begin
-  inherited;
+  result := inherited DoTask;
+  (owner as TAInteger).Val := 65;
+  result := false;
+end;
+
+constructor TATypeEventAfterTest.Create(aparent: TAObj; var v: Integer);
+begin
+  Create(aparent);
+  locV := @v;
+end;
+
+function TATypeEventAfterTest.DoTask: boolean;
+begin
+  result := inherited DoTask;
   (owner as TAInteger).Val := 66;
+  locV^ := 99;
 end;
 
 end.
